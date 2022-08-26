@@ -121,7 +121,8 @@ function loadData(filename) {
 
 	graph.forEach(edge => {
 		const data = edge.split(" ")
-		
+		if(data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [vertex ID] [weight]!");
+
 		Data.checkAndAdd(new Vertex(data[0]), Data.type.VERTEX)
 		Data.checkAndAdd(new Vertex(data[1]), Data.type.VERTEX)
 
@@ -149,7 +150,7 @@ function dijkstra(startVertexID, endVertexID) {
 	
 	while (!F.includes(endVertex)) {																						// STEP 1
 		
-		if (i > Data.vertices.length) throw new Error("Something went wrong!") // prevent infinite loop
+		if (i > Data.vertices.length) throw new Error("The algorithm entered an infinite loop!") // prevent infinite loop
 		const iteration = [] // to log iterations
 		iteration.push(`\nIteration: ${i}`)
 
@@ -252,6 +253,28 @@ function saveData(filename) {
 	console.log(`Log saved to ${filename}`)
 }
 
-loadData("graph.txt")
-reconstructPath(dijkstra(1, 27))
-saveData("log.txt")
+function run() {
+	const args = process.argv.slice(2)
+
+	try {
+		loadData(args[0])
+	} catch(e) {
+		console.log(`\nAn error occured while loading the graph:\n\n${e.message}\n\nCheck if:\n`,
+		"- The graph file's name wasn't misspelled and the file is located in the same folder as the launch file;\n",
+		"- The graph file is formatted correctly and the weight of each edge is a number")
+		return
+	}
+
+	try {
+		reconstructPath(dijkstra(args[1], args[2]))
+	} catch(e) {
+		console.log(`An error occured while calculating the shortest path:\n\n${e.message}\n\nCheck if:\n`,
+		"- The graph file is formatted correctly;\n",
+		"- Each edge has been described correctly")
+		return
+	}
+
+	saveData(args[3])
+}
+
+run()

@@ -15,7 +15,6 @@ How to use:
    - the list of edges which were ananyzed
    - the list of edges making up the shortest path
 
-The files related to my Math IA are:
- - **graph.txt** - mentioned before
+The other files related to my Math IA are:
  - **log for graph 2.1.txt** - the log remaining searching the shortest path in *graph.txt* from vertex 1 to 27
  - **log for graph 2.2.txt** - the log remaining searching the shortest path in *graph.txt* from vertex 1 to 28

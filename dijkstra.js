@@ -184,7 +184,7 @@ function dijkstra(startVertexID, endVertexID) {
 		i++
 	}
 
-	return {endVertex: endVertex, parent: parent, finalDist: P.get(endVertex)}
+	return {startVertex: startVertex, endVertex: endVertex, parent: parent, finalDist: P.get(endVertex)}
 }
 
 /**
@@ -195,7 +195,7 @@ function reconstructPath(data) {
 	const path = []
 	reconstruct(data.parent, data.endVertex, path)
 	
-	let finalPath = "Shortest path: 1 -> "
+	let finalPath = `Shortest path: ${data.startVertex} -> `
 	path.forEach(vertex => {
 		finalPath += `${vertex.id} -> `
 	})

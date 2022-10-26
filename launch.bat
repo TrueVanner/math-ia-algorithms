@@ -2,6 +2,16 @@
 set /p "graphfilename=Enter the name of the file where the graph is stored (default: graph.txt): "
 if "%graphfilename%"=="" set graphfilename=graph.txt
 
+:loop
+set /p "mode=Enter the type of the algorithm (0 = Dijkstra's algorithm, 1 = A* algorithm): 
+if "%mode%"=="" (goto loop)
+if "%mode%"=="0" if "%mode%"=="1" else (goto loop)
+
+if "%mode%"=="1" (
+set /p "coordsfilename=Enter the name of the file where the relative coordinates of each vertex are stored (default: coords.txt): "
+if "%coordsfilename%"=="" set coordsfilename=coords.txt
+)
+
 :loop1
 set /p "start=Enter the ID of the starting vertex: "
 if "%start%"=="" (
@@ -24,5 +34,5 @@ goto loop2
 set /p "logfilename=Enter the name of the file where the log of the process will be stored (default: log.txt): "
 if "%logfilename%"=="" set logfilename=log.txt
 
-node dijkstra.js %graphfilename% %start% %end% %logfilename%
+node algorithms.js %graphfilename% %mode% %coordsfilename% %start% %end% %logfilename%
 pause

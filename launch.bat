@@ -1,4 +1,5 @@
 @echo off
+:start
 set /p "graphfilename=Enter the name of the file where the graph is stored (default: graph.txt): "
 if "%graphfilename%"=="" set graphfilename=graph.txt
 
@@ -7,9 +8,9 @@ set /p "mode=Enter the type of the algorithm (0 = Dijkstra's algorithm, 1 = A* a
 if "%mode%"=="" (goto loop)
 if "%mode%"=="0" if "%mode%"=="1" else (goto loop)
 
+set coordsfilename=coords.txt
 if "%mode%"=="1" (
 set /p "coordsfilename=Enter the name of the file where the relative coordinates of each vertex are stored (default: coords.txt): "
-if "%coordsfilename%"=="" set coordsfilename=coords.txt
 )
 
 :loop1
@@ -35,4 +36,14 @@ set /p "logfilename=Enter the name of the file where the log of the process will
 if "%logfilename%"=="" set logfilename=log.txt
 
 node algorithms.js %graphfilename% %mode% %coordsfilename% %start% %end% %logfilename%
-pause
+
+set /p "loop=Continue working? (0 = yes, 1 = no): "
+if "%loop%"=="0" (
+set %graphfilename%=""
+set %mode%=""
+set %start%=""
+set %end%=""
+set %logfilename%=""
+set %loop%=""
+goto start
+)

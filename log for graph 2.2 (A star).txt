@@ -126,9 +126,7 @@ Changed vertices:
  - Vertex: ID = 28, Coordinates: x=486, y=76 changed value in P from Infinity to 476 and the value in G from Infinity to 476
 
 Iteration: 10
-To be analyzed: ID = 28 (value in G: 476)
-Changed vertices:
- - Vertex: ID = 25, Coordinates: x=475, y=10 changed value in P from Infinity to 519 and the value in G from Infinity to 586
+The target vertex was reached! Reconstructing the path.
 
 Total iterations: 10
 
@@ -144,21 +142,13 @@ Edge: Vertices [ID = 19 ID = 20], W = 17
 Edge: Vertices [ID = 20 ID = 26], W = 121
 Edge: Vertices [ID = 26 ID = 28], W = 64
 
-Analyzed edges (doesn't include the shortest edges making up the shortest path):
+Edges that were analyzed but aren't in the shortest path:
 
-Edge: Vertices [ID = 1 ID = 2], W = 38
 Edge: Vertices [ID = 2 ID = 4], W = 38
-Edge: Vertices [ID = 2 ID = 3], W = 7
-Edge: Vertices [ID = 3 ID = 6], W = 6
 Edge: Vertices [ID = 6 ID = 7], W = 15
 Edge: Vertices [ID = 14 ID = 15], W = 21
-Edge: Vertices [ID = 6 ID = 15], W = 119
-Edge: Vertices [ID = 15 ID = 16], W = 35
 Edge: Vertices [ID = 16 ID = 17], W = 22
-Edge: Vertices [ID = 16 ID = 19], W = 69
 Edge: Vertices [ID = 18 ID = 19], W = 58
-Edge: Vertices [ID = 19 ID = 20], W = 17
 Edge: Vertices [ID = 20 ID = 21], W = 62
-Edge: Vertices [ID = 20 ID = 26], W = 121
-Edge: Vertices [ID = 26 ID = 28], W = 64
-Edge: Vertices [ID = 25 ID = 28], W = 43
+
+Total amount of edges analyzed: 15

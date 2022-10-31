@@ -32,7 +32,7 @@ class Vertex {
 	getID() {return `ID = ${this.id}`}
 	toString() {
 		let str = `Vertex: ${this.getID()}`
-		if(this.coordinates.x) str += `, Coordinates: x=${this.coordinates.x}, y=${this.coordinates.y}`
+		if(this.coordinates) str += `, Coordinates: x=${this.coordinates.x}, y=${this.coordinates.y}`
 		return str
 	}
 }
@@ -64,10 +64,16 @@ class Edge {
 }
 
 class Data {
-	// used to form a log
+	//--- used to form a log ---//
 	static iterations = []
+
+	/** @type {Edge[]} */
 	static shortestPathEdges = []
+
+	/** @type {Edge[]} */
 	static analyzedEdges = []
+
+	//--------------------------//
 
 	/** @type {Vertex[]} */
 	static vertices = []
@@ -180,6 +186,12 @@ function dijkstra(startVertexID, endVertexID) {
 		})
 		F.push(y)
 
+		if(y.equals(endVertex)) { // ends the cycle early if the vertex was found
+			iteration.push("The target vertex was reached! Reconstructing the path.")
+			Data.iterations.push(iteration)
+			break;
+		}
+
 		iteration.push(`To be analyzed: ${y.getID()} (value in P: ${P.get(y)})`)
 		iteration.push("Changed vertices:")
 
@@ -252,13 +264,19 @@ function a_star(startVertexID, endVertexID) {
 			}
 		})
 		F.push(y)
+		if(y.equals(endVertex)) { // ends the cycle early if the vertex was found
+			iteration.push("The target vertex was reached! Reconstructing the path.")
+			Data.iterations.push(iteration)
+			break;
+		}
 
 		iteration.push(`To be analyzed: ${y.getID()} (value in G: ${G.get(y)})`)
 		iteration.push("Changed vertices:")
 
 		y.allNeighbors().forEach(x => {
 			const edge = Data.find(Data.Type.EDGE, [x, y])
-			Data.analyzedEdges.push(edge)
+
+			if(!Data.analyzedEdges.includes(edge)) Data.analyzedEdges.push(edge)
 
 			if(P.get(x) > P.get(y) + edge.weight) {
 				iteration.push(` - ${x} changed value in P from ${P.get(x)} to ${P.get(y) + edge.weight} and the value in G from ${G.get(x)} to ${P.get(y) + edge.weight + h(x, endVertex)}`)
@@ -280,11 +298,17 @@ function a_star(startVertexID, endVertexID) {
  * @param {{endVertex: Vertex, parent: Map<Vertex, Vertex>, finalDist: Number}} data - the output of the algorithm
  */
 function reconstructPath(data) {
-	const path = []
-	reconstruct(data.parent, data.endVertex, path)
+	reconstruct(data.parent, data.endVertex)
 	
-	let finalPath = "Shortest path: 1 -> "
-	path.forEach(vertex => {
+	let final = [];
+
+	let finalPath = "Shortest path: "
+	Data.shortestPathEdges.forEach(edge => {
+		if(!final.includes(edge.v1)) final.push(edge.v1)
+		if(!final.includes(edge.v2)) final.push(edge.v2)
+	})
+
+	final.forEach(vertex => {
 		finalPath += `${vertex.id} -> `
 	})
 
@@ -295,19 +319,16 @@ function reconstructPath(data) {
  * Recursively reconstructs the path from starting to ending vertex and writes it in the array
  * 
  * @param {Map<Vertex, Vertex>} parent - the parent data
- * @param {*} vertex - the parent of this vertex must be found
- * @param {*} arr - the array to which the reconstructed path will be written
+ * @param {Vertex} vertex - the parent of this vertex must be found
  */
-function reconstruct(parent, vertex, arr) {
+function reconstruct(parent, vertex) {
 	if(parent.has(vertex)) {
-		arr.unshift(vertex)
 
 		// to form the log
 		let edge = Data.find(Data.Type.EDGE, [vertex, parent.get(vertex)])
 		Data.shortestPathEdges.unshift(edge)
-		Data.analyzedEdges.splice(Data.analyzedEdges.indexOf(edge), 1)
 
-		return reconstruct(parent, parent.get(vertex), arr)
+		return reconstruct(parent, parent.get(vertex))
 	}
 }
 
@@ -332,10 +353,12 @@ function saveData(filename) {
 	final.push(`\nTotal iterations: ${Data.iterations.length}`)
 
 	final.push("\nEdges making up the shortest path:\n")
-	Data.shortestPathEdges.forEach(edge => final.push(edge + ""))
+	Data.shortestPathEdges.forEach(edge => final.push(edge.toString()))
 
-	final.push("\nAnalyzed edges (doesn't include the shortest edges making up the shortest path):\n")
-	Data.analyzedEdges.forEach(edge => final.push(edge + ""))
+	final.push("\nEdges that were analyzed but aren't in the shortest path:\n")
+	Data.analyzedEdges.filter(x => !Data.shortestPathEdges.includes(x)).forEach(edge => final.push(edge.toString()))
+
+	final.push(`\nTotal amount of edges analyzed: ${Data.analyzedEdges.length}`)
 	
 	fs.writeFileSync(filename, final.join("\n"))
 	console.log(`Log saved to ${filename}`)
@@ -344,8 +367,6 @@ function saveData(filename) {
 // To apply the algorithms through the .bat file
 function run() {
 	const args = process.argv.slice(2)
-
-	console.log(args)
 
 	try {
 		loadData(args[0])

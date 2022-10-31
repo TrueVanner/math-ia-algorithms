@@ -22,17 +22,19 @@ class Vertex {
 	allNeighbors() {
 		const neighbors = []
 		Data.edges.forEach(edge => {
-			if(edge.v1.equals(this)) neighbors.push(edge.v2)
-			if(edge.v2.equals(this)) neighbors.push(edge.v1)
+			if (edge.v1.equals(this)) neighbors.push(edge.v2)
+			if (edge.v2.equals(this)) neighbors.push(edge.v1)
 		})
 		return neighbors
 	}
 
 	// Used for better formating of logs
-	getID() {return `ID = ${this.id}`}
+	getID() {
+		return `ID = ${this.id}`
+	}
 	toString() {
 		let str = `Vertex: ${this.getID()}`
-		if(this.coordinates) str += `, Coordinates: x=${this.coordinates.x}, y=${this.coordinates.y}`
+		if (this.coordinates) str += `, Coordinates: x=${this.coordinates.x}, y=${this.coordinates.y}`
 		return str
 	}
 }
@@ -60,7 +62,9 @@ class Edge {
 	}
 
 	// Used for better formating of logs
-	toString() {return `Edge: Vertices [${this.v1.getID()} ${this.v2.getID()}], W = ${this.weight}`}
+	toString() {
+		return `Edge: Vertices [${this.v1.getID()} ${this.v2.getID()}], W = ${this.weight}`
+	}
 }
 
 class Data {
@@ -81,7 +85,11 @@ class Data {
 	/** @type {Edge[]} */
 	static edges = []
 
-	static Type = Object.freeze({VERTEX: 0, EDGE: 1, ITERATION: 2}) // "enum"
+	static Type = Object.freeze({
+		VERTEX: 0,
+		EDGE: 1,
+		ITERATION: 2
+	}) // "enum"
 
 	/**
 	 * Adds the value into the corresponding array, avoids repetition
@@ -91,13 +99,13 @@ class Data {
 	static checkAndAdd(value, dataType) {
 		switch (dataType) {
 			case 0:
-				if(!this.vertices.find(vertex => vertex.equals(value)))
+				if (!this.vertices.find(vertex => vertex.equals(value)))
 					this.vertices.push(value)
 				break
 			case 1:
-				if(!this.edges.find(edge => edge.equals(value)))
+				if (!this.edges.find(edge => edge.equals(value)))
 					this.edges.push(value)
-				break	
+				break
 		}
 	}
 
@@ -108,15 +116,15 @@ class Data {
 	 * @returns the object of the specified type with specified params
 	 */
 	static find(type, params) {
-		switch(type) {
+		switch (type) {
 			case 0:
 				const vertex = Data.vertices.find(vertex => vertex.id == params)
-				if(vertex) return vertex
+				if (vertex) return vertex
 				throw new Error("A vertex with such ID isn't present in the graph.")
 			case 1:
 				const edge = Data.edges.find(edge => (edge.v1.equals(params[0]) && edge.v2.equals(params[1])) ||
-													 (edge.v1.equals(params[1]) && edge.v2.equals(params[0])))
-				if(edge) return edge
+					(edge.v1.equals(params[1]) && edge.v2.equals(params[0])))
+				if (edge) return edge
 				throw new Error("Such an edge isn't present in the graph.")
 		}
 	}
@@ -131,7 +139,7 @@ function loadData(filename) {
 
 	graph.forEach(edge => {
 		const data = edge.split(" ")
-		if(data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [vertex ID] [weight]!");
+		if (data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [vertex ID] [weight]!");
 
 		Data.checkAndAdd(new Vertex(data[0]), Data.Type.VERTEX)
 		Data.checkAndAdd(new Vertex(data[1]), Data.Type.VERTEX)
@@ -149,8 +157,11 @@ function loadCoords(filename) {
 
 	coords.forEach(line => {
 		const data = line.split(" ");
-		if(data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [X coordinate] [Y coordinate]!");
-		Data.find(Data.Type.VERTEX, parseInt(data[0])).coordinates = {x: parseInt(data[1]), y: parseInt(data[2])}
+		if (data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [X coordinate] [Y coordinate]!");
+		Data.find(Data.Type.VERTEX, parseInt(data[0])).coordinates = {
+			x: parseInt(data[1]),
+			y: parseInt(data[2])
+		}
 	})
 }
 
@@ -171,22 +182,22 @@ function dijkstra(startVertexID, endVertexID) {
 	const parent = new Map()
 
 	let i = 1 // to count iterations and prevent infinite loops
-	
+
 	while (!F.includes(endVertex)) {
-		
+
 		if (i > Data.vertices.length) throw new Error("The algorithm entered an infinite loop!") // prevent infinite loop
 		const iteration = [] // to log iterations
 		iteration.push(`\nIteration: ${i}`)
 
 		let y
 		Data.vertices.forEach(vertex => {
-			if(!F.includes(vertex)) {
-				if(!Data.vertices.find(x => !x.equals(vertex) && !F.includes(x) && P.get(x) < P.get(vertex))) y = vertex
+			if (!F.includes(vertex)) {
+				if (!Data.vertices.find(x => !x.equals(vertex) && !F.includes(x) && P.get(x) < P.get(vertex))) y = vertex
 			}
 		})
 		F.push(y)
 
-		if(y.equals(endVertex)) { // ends the cycle early if the vertex was found
+		if (y.equals(endVertex)) { // ends the cycle early if the vertex was found
 			iteration.push("The target vertex was reached! Reconstructing the path.")
 			Data.iterations.push(iteration)
 			break;
@@ -197,13 +208,13 @@ function dijkstra(startVertexID, endVertexID) {
 
 		y.allNeighbors().forEach(x => {
 
-			if(!F.includes(x)) {
+			if (!F.includes(x)) {
 				parent.set(x, y)
 				const edge = Data.find(Data.Type.EDGE, [x, y])
 				Data.analyzedEdges.push(edge)
-				if(P.get(x) > P.get(y) + edge.weight) {
+				if (P.get(x) > P.get(y) + edge.weight) {
 					// generating the log
-					iteration.push(` - ${x} changed value from ${P.get(x)} to ${P.get(y) + edge.weight}`)		
+					iteration.push(` - ${x} changed value in P from ${P.get(x)} to ${P.get(y) + edge.weight}`)
 
 					P.set(x, P.get(y) + edge.weight)
 				}
@@ -214,7 +225,11 @@ function dijkstra(startVertexID, endVertexID) {
 		i++
 	}
 
-	return {endVertex: endVertex, parent: parent, finalDist: P.get(endVertex)}
+	return {
+		endVertex: endVertex,
+		parent: parent,
+		finalDist: P.get(endVertex)
+	}
 }
 
 
@@ -250,21 +265,21 @@ function a_star(startVertexID, endVertexID) {
 	const parent = new Map()
 
 	let i = 1 // to count iterations and prevent infinite loops
-	
+
 	while (!F.includes(endVertex)) {
-		
+
 		if (i > Data.vertices.length) throw new Error("The algorithm entered an infinite loop!") // prevent infinite loop
 		const iteration = [] // to log iterations
 		iteration.push(`\nIteration: ${i}`)
 
 		let y
 		Data.vertices.forEach(vertex => {
-			if(!F.includes(vertex)) {
-				if(!Data.vertices.find(x => !x.equals(vertex) && !F.includes(x) && G.get(x) < G.get(vertex))) y = vertex
+			if (!F.includes(vertex)) {
+				if (!Data.vertices.find(x => !x.equals(vertex) && !F.includes(x) && G.get(x) < G.get(vertex))) y = vertex
 			}
 		})
 		F.push(y)
-		if(y.equals(endVertex)) { // ends the cycle early if the vertex was found
+		if (y.equals(endVertex)) { // ends the cycle early if the vertex was found
 			iteration.push("The target vertex was reached! Reconstructing the path.")
 			Data.iterations.push(iteration)
 			break;
@@ -276,21 +291,25 @@ function a_star(startVertexID, endVertexID) {
 		y.allNeighbors().forEach(x => {
 			const edge = Data.find(Data.Type.EDGE, [x, y])
 
-			if(!Data.analyzedEdges.includes(edge)) Data.analyzedEdges.push(edge)
+			if (!Data.analyzedEdges.includes(edge)) Data.analyzedEdges.push(edge)
 
-			if(P.get(x) > P.get(y) + edge.weight) {
+			if (P.get(x) > P.get(y) + edge.weight) {
 				iteration.push(` - ${x} changed value in P from ${P.get(x)} to ${P.get(y) + edge.weight} and the value in G from ${G.get(x)} to ${P.get(y) + edge.weight + h(x, endVertex)}`)
 				P.set(x, P.get(y) + edge.weight)
 				G.set(x, P.get(x) + h(x, endVertex))
 				parent.set(x, y)
-				if(F.includes(x)) F.splice(F.indexOf(x), 1)
+				if (F.includes(x)) F.splice(F.indexOf(x), 1)
 			}
 		})
 		Data.iterations.push(iteration)
 		i++
 	}
 
-	return {endVertex: endVertex, parent: parent, finalDist: P.get(endVertex)}
+	return {
+		endVertex: endVertex,
+		parent: parent,
+		finalDist: P.get(endVertex)
+	}
 }
 
 /**
@@ -299,13 +318,13 @@ function a_star(startVertexID, endVertexID) {
  */
 function reconstructPath(data) {
 	reconstruct(data.parent, data.endVertex)
-	
+
 	let final = [];
 
 	let finalPath = "Shortest path: "
 	Data.shortestPathEdges.forEach(edge => {
-		if(!final.includes(edge.v1)) final.push(edge.v1)
-		if(!final.includes(edge.v2)) final.push(edge.v2)
+		if (!final.includes(edge.v1)) final.push(edge.v1)
+		if (!final.includes(edge.v2)) final.push(edge.v2)
 	})
 
 	final.forEach(vertex => {
@@ -322,7 +341,7 @@ function reconstructPath(data) {
  * @param {Vertex} vertex - the parent of this vertex must be found
  */
 function reconstruct(parent, vertex) {
-	if(parent.has(vertex)) {
+	if (parent.has(vertex)) {
 
 		// to form the log
 		let edge = Data.find(Data.Type.EDGE, [vertex, parent.get(vertex)])
@@ -344,7 +363,7 @@ function saveData(filename) {
 	Data.edges.forEach(edge => final.push(edge + ""))
 
 	final.push("\n\nAll iterations:")
-		Data.iterations.forEach(iteration => {
+	Data.iterations.forEach(iteration => {
 		iteration.forEach(line => {
 			final.push(line)
 		})
@@ -359,7 +378,7 @@ function saveData(filename) {
 	Data.analyzedEdges.filter(x => !Data.shortestPathEdges.includes(x)).forEach(edge => final.push(edge.toString()))
 
 	final.push(`\nTotal amount of edges analyzed: ${Data.analyzedEdges.length}`)
-	
+
 	fs.writeFileSync(filename, final.join("\n"))
 	console.log(`Log saved to ${filename}`)
 }
@@ -370,27 +389,27 @@ function run() {
 
 	try {
 		loadData(args[0])
-		if(args[1] == "1") loadCoords(args[2])
-	} catch(e) {
+		if (args[1] == "1") loadCoords(args[2])
+	} catch (e) {
 		console.log(`\nAn error occured while loading the graph:\n\n${e.message}\n\nCheck if:\n`,
-		"- The graph file's name wasn't misspelled and the file is located in the same folder as the launch file;\n",
-		"- The graph file is formatted correctly and the weight of each edge is a number")
+			"- The graph file's name wasn't misspelled and the file is located in the same folder as the launch file;\n",
+			"- The graph file is formatted correctly and the weight of each edge is a number")
 		return
 	}
 
 	try {
-		if(args[1] == "0") {
+		if (args[1] == "0") {
 			reconstructPath(dijkstra(args[3], args[4]))
 		} else {
 			reconstructPath(a_star(args[3], args[4]))
 		}
-	} catch(e) {
+	} catch (e) {
 		console.log(`An error occured while calculating the shortest path:\n\n${e.message}\n\nCheck if:\n`,
-		"- The graph file is formatted correctly;\n",
-		"- Each edge has been described correctly")
+			"- The graph file is formatted correctly;\n",
+			"- Each edge has been described correctly")
 		return
 	}
-	
+
 	saveData(args[5])
 }
 

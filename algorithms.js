@@ -137,9 +137,22 @@ class Data {
 function loadData(filename) {
 	const graph = fs.readFileSync(filename, "utf-8").split("\n")
 
+	
+	/* graph.sort((a, b) => parseInt(a.split(" ")[2]) - parseInt(b.split(" ")[2]))
+
+	// graph.forEach(edge => {
+
+	// 	console.log(graph.includes(`${edge[1]} ${edge[0]}`) ? edge : "")
+	// })
+
+	fs.writeFileSync("graph3.txt", graph.join("\n")) */
+
+
 	graph.forEach(edge => {
 		const data = edge.split(" ")
 		if (data.length != 3) throw new Error("Graph format error! Please check if each line of the provided file has the format of [vertex ID] [vertex ID] [weight]!");
+
+		
 
 		Data.checkAndAdd(new Vertex(data[0]), Data.Type.VERTEX)
 		Data.checkAndAdd(new Vertex(data[1]), Data.Type.VERTEX)
@@ -209,12 +222,15 @@ function dijkstra(startVertexID, endVertexID) {
 		y.allNeighbors().forEach(x => {
 
 			if (!F.includes(x)) {
-				parent.set(x, y)
+				// generating the log
 				const edge = Data.find(Data.Type.EDGE, [x, y])
 				Data.analyzedEdges.push(edge)
 				if (P.get(x) > P.get(y) + edge.weight) {
+					parent.set(x, y)
+
 					// generating the log
 					iteration.push(` - ${x} changed value in P from ${P.get(x)} to ${P.get(y) + edge.weight}`)
+					iteration.push(` - Parent of ${x} set to ${y}`)
 
 					P.set(x, P.get(y) + edge.weight)
 				}
@@ -294,10 +310,11 @@ function a_star(startVertexID, endVertexID) {
 			if (!Data.analyzedEdges.includes(edge)) Data.analyzedEdges.push(edge)
 
 			if (P.get(x) > P.get(y) + edge.weight) {
-				iteration.push(` - ${x} changed value in P from ${P.get(x)} to ${P.get(y) + edge.weight} and the value in G from ${G.get(x)} to ${P.get(y) + edge.weight + h(x, endVertex)}`)
+				iteration.push(` - ${x} changed value in\n * From ${P.get(x)} to ${P.get(y) + edge.weight} in P\n * From ${G.get(x)} to ${P.get(y) + edge.weight + h(x, endVertex)} in G`)
 				P.set(x, P.get(y) + edge.weight)
 				G.set(x, P.get(x) + h(x, endVertex))
 				parent.set(x, y)
+				iteration.push(` - Parent of ${x} set to ${y}`)
 				if (F.includes(x)) F.splice(F.indexOf(x), 1)
 			}
 		})
@@ -414,3 +431,4 @@ function run() {
 }
 
 run()
+// loadData("graph2.txt")

@@ -1,6 +1,7 @@
 @echo off
 :start
-set /p "graphfilename=Enter the name of the file where the graph is stored (default: graph.txt): "
+set graphfilename=graph.txt
+set /p "graphfilename=Enter the name of the file where the graph is stored (default: %graphfilename%): "
 if "%graphfilename%"=="" set graphfilename=graph.txt
 
 :loop
